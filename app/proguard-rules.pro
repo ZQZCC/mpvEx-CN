@@ -58,8 +58,7 @@
 # Keep MBassador core classes
 -keep class net.engio.mbassy.** { *; }
 
-# BouncyCastle (crypto provider used by SMBJ)
--keep class org.bouncycastle.** { *; }
+# BouncyCastle classes referenced by SMBJ are retained through R8's call graph.
 -dontwarn org.bouncycastle.**
 
 # ASN.1 classes

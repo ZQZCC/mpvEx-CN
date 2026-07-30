@@ -12,6 +12,7 @@ plugins {
 android {
   namespace = "app.marlboroadvance.mpvex"
   compileSdk = 36
+  ndkVersion = "29.0.14206865"
 
   defaultConfig {
     applicationId = "app.marlboroadvance.mpvex"
@@ -111,6 +112,9 @@ android {
       excludes += "META-INF/NOTICE*"
       excludes += "META-INF/*.kotlin_module"
       excludes += "META-INF/versions/9/OSGI-INF/MANIFEST.MF"
+      excludes += "org/bouncycastle/pqc/crypto/picnic/lowmcL1.bin.properties"
+      excludes += "org/bouncycastle/pqc/crypto/picnic/lowmcL3.bin.properties"
+      excludes += "org/bouncycastle/pqc/crypto/picnic/lowmcL5.bin.properties"
     }
     jniLibs {
       useLegacyPackaging = true
