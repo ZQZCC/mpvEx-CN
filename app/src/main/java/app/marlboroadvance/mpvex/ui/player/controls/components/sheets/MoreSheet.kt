@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -19,14 +18,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Tune
-import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Timer
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -41,7 +37,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -81,22 +76,7 @@ fun MoreSheet(
   val gpuNext by decoderPreferences.gpuNext.collectAsState()
   val useVulkan by decoderPreferences.useVulkan.collectAsState()
   
-  val context = LocalContext.current
-val scope = rememberCoroutineScope()
-var infoDialogData by remember { mutableStateOf<Pair<String, String>?>(null) }
-
-if (infoDialogData != null) {
-    AlertDialog(
-        onDismissRequest = { },
-        title = { Text(infoDialogData!!.first) },
-        text = { Text(infoDialogData!!.second) },
-        confirmButton = {
-            TextButton(onClick = { infoDialogData = null }) {
-                Text(stringResource(R.string.generic_ok))
-            }
-        }
-    )
-}
+  val scope = rememberCoroutineScope()
 
   PlayerSheet(
     onDismissRequest,
@@ -160,19 +140,10 @@ if (infoDialogData != null) {
           }
         }
       }
-      SectionHeaderWithInfo(
-        title = stringResource(R.string.player_sheets_stats_page_title),
-        onInfoClick = {
-             val descResName = "player_sheets_stats_page_${statisticsPage}_desc"
-             val resId = context.resources.getIdentifier(descResName, "string", context.packageName)
-             val description = if (resId != 0) context.getString(resId) else ""
-             
-             // Title for dialog: "Page X" or "Direct Title"
-             val titleRes = if (statisticsPage == 0) R.string.player_sheets_tracks_off else R.string.player_sheets_stats_page_chip
-             val title = if (statisticsPage == 0) context.getString(titleRes) else context.getString(titleRes, statisticsPage)
-             
-             infoDialogData = Pair(context.getString(R.string.player_sheets_stats_page_title), "$title: $description")
-        }
+      Text(
+        text = stringResource(R.string.player_sheets_stats_page_title),
+        style = MaterialTheme.typography.titleMedium,
+        color = MaterialTheme.colorScheme.primary
       )
       LazyRow(
         horizontalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.smaller),
@@ -434,33 +405,4 @@ fun TimePickerDialog(
     }
   }
   }
-
-
-@Composable
-fun SectionHeaderWithInfo(
-  title: String,
-  onInfoClick: () -> Unit,
-  modifier: Modifier = Modifier
-) {
-  Row(
-    modifier = modifier.fillMaxWidth(),
-    horizontalArrangement = Arrangement.Start,
-    verticalAlignment = Alignment.CenterVertically
-  ) {
-    Text(
-      text = title,
-      style = MaterialTheme.typography.titleMedium,
-      color = MaterialTheme.colorScheme.primary
-    )
-    Spacer(modifier = Modifier.width(8.dp))
-    IconButton(onClick = onInfoClick, modifier = Modifier.size(24.dp)) {
-      Icon(
-        imageVector = Icons.Outlined.Info,
-        contentDescription = "信息",
-        tint = MaterialTheme.colorScheme.primary,
-        modifier = Modifier.size(16.dp)
-      )
-    }
-  }
-}
 
