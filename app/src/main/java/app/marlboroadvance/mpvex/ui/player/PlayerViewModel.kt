@@ -316,7 +316,7 @@ class PlayerViewModel(
   val isVerticalFlipped: StateFlow<Boolean> = _isVerticalFlipped.asStateFlow()
 
   // ==================== Ambience Mode ======================================
-  private val _isAmbientEnabled = MutableStateFlow(false)
+  private val _isAmbientEnabled = MutableStateFlow(playerPreferences.isAmbientEnabled.get())
   val isAmbientEnabled: StateFlow<Boolean> = _isAmbientEnabled.asStateFlow()
 
   private val _ambientBlurSamples = MutableStateFlow(playerPreferences.ambientBlurSamples.get())
@@ -2152,6 +2152,7 @@ class PlayerViewModel(
 
   fun toggleAmbientMode() {
     _isAmbientEnabled.value = !_isAmbientEnabled.value
+    playerPreferences.isAmbientEnabled.set(_isAmbientEnabled.value)
     if (_isAmbientEnabled.value) {
       lastAmbientScaleX = -1.0 // Force rewrite
       updateAmbientStretch()
@@ -2191,11 +2192,17 @@ class PlayerViewModel(
     }
   }
 
-  /** Resets ambient mode to OFF when a new video file is loaded. */
+  /** Resets ambient mode when a new video file is loaded. Keeps ambient state persistent. */
   fun resetAmbientMode() {
     if (!_isAmbientEnabled.value) return
-    _isAmbientEnabled.value = false
+
+    // Ambient Mode Persistent Fix for Next/Previous files
+    // DO NOT set _isAmbientEnabled.value = false
+    // Just temporarily remove the old shader and reset the scale
+    // so the new video starts with a clean slate before recalculating.
     disableAmbientShader()
+    lastAmbientScaleX = -1.0
+    lastAmbientScaleY = -1.0
   }
 
   /**
@@ -2573,6 +2580,13 @@ vec4 hook() {
 
   fun showToast(message: String) {
     Toast.makeText(host.context, message, Toast.LENGTH_SHORT).show()
+  }
+
+  override fun onCleared() {
+    super.onCleared()
+    ambientDebounceJob?.cancel()
+    ambientShaderFile?.delete()
+    ambientShaderFile = null
   }
 }
 
